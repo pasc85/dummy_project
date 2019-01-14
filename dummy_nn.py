@@ -1,13 +1,14 @@
 from random import randint as ri
 import numpy as np
 from sklearn.neural_network import MLPClassifier
+from sklearn import tree
 
 global n_bits
-n_bits = 21
+n_bits = 20
 
 
 def conv(i):
-    fs = '{0:0' + str(n_bits) + 'b}' 
+    fs = '{0:0' + str(n_bits) + 'b}'
     t = fs.format(i)
     return [int(c) for c in t]
 
@@ -32,8 +33,17 @@ def generate_data(size):
     return X, y
 
 
-def accuracy_hls_config(X_train, y_train, X_test, y_test, hls=(n_bits,)):
-    clf = MLPClassifier(solver='lbfgs', hidden_layer_sizes=hls)
+def accuracy_hls_config(X_train, y_train, X_test, y_test,
+                        hls=(n_bits,), alpha=0.0001):
+    clf = MLPClassifier(solver='lbfgs', hidden_layer_sizes=hls, alpha=alpha)
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    accuracy = sum(y_test == y_pred)/len(y_test)
+    return accuracy
+
+
+def accuracy_tree(X_train, y_train, X_test, y_test):
+    clf = tree.DecisionTreeClassifier()
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
     accuracy = sum(y_test == y_pred)/len(y_test)
